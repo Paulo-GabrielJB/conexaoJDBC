@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -66,6 +67,15 @@ public class DB {
 		try {
 			if(rs != null)
 				rs.close();
+		}catch(SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+	}
+	
+	public static void closePreparedStatement(PreparedStatement pst) {
+		try {
+			if(pst != null)
+				pst.close();
 		}catch(SQLException e) {
 			throw new DbException(e.getMessage());
 		}
