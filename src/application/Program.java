@@ -2,11 +2,7 @@ package application;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import db.DB;
 
@@ -14,43 +10,27 @@ public class Program {
 
 	public static void main(String[] args) {
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Connection conn = null;
-		PreparedStatement pst = null;
+		PreparedStatement st = null;
 		try {
+			conn =DB.getConnection();
+			st = conn.prepareStatement(
+					"UPDATE seller "
+					+ "SET BaseSalary = BaseSalary + ? "
+					+ "WHERE"
+					+ "(DepartmentId = ?)");
 			
-			conn = DB.getConnection();
+			st.setDouble(1, 150.0); //primeiro parametro
+			st.setInt(2, 1);
 			
-			pst = conn.prepareStatement(
-					"INSERT INTO seller "
-					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
-					+ "VALUES"
-					+ "(?, ?, ?, ?, ?)", 
-					Statement.RETURN_GENERATED_KEYS); //as interrogações são os placeholdes, como são 5 colunas, temos 5 interrogações
+			int rowsAffected = st.executeUpdate();
 			
-			pst.setString(1, "Paulo Gabriel"); //primeira coluna do tipo string
-			pst.setString(2, "paulo.gabriel@gmail.com"); //segunda coluna do tipo string
-			pst.setDate(3, new java.sql.Date(sdf.parse("10/08/1999").getTime())); //terceira coluna do tipo Date, tem q ser o Date do SQL
-			pst.setDouble(4, 2750.0); //quarta coluna do tipo double
-			pst.setInt(5, 1); //quinta coluna do tipo int
+			System.out.println("Done! Rows Affected " + rowsAffected);
 			
-			int rowsAffected = pst.executeUpdate(); //executa a query e retorna as linhas afetadas
-			
-			if(rowsAffected > 0) {
-				ResultSet rs = pst.getGeneratedKeys();
-				while(rs.next()) {
-					int id = rs.getInt(1);
-					System.out.println("Done! Id = " + id);
-				}
-			}
-			else
-				System.out.println("No rows affected");
-					
-			
-		}catch(SQLException | ParseException e) {
+		}catch(SQLException e) {
 			e.printStackTrace();
-		} finally {
-			DB.closePreparedStatement(pst);
+		}finally {
+			DB.closePreparedStatement(st);
 			DB.closeConnection();
 		}
 		
