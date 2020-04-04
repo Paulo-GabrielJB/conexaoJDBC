@@ -2,7 +2,9 @@ package application;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -23,7 +25,8 @@ public class Program {
 					"INSERT INTO seller "
 					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
 					+ "VALUES"
-					+ "(?, ?, ?, ?, ?)"); //as interrogações são os placeholdes, como são 5 colunas, temos 5 interrogações
+					+ "(?, ?, ?, ?, ?)", 
+					Statement.RETURN_GENERATED_KEYS); //as interrogações são os placeholdes, como são 5 colunas, temos 5 interrogações
 			
 			pst.setString(1, "Paulo Gabriel"); //primeira coluna do tipo string
 			pst.setString(2, "paulo.gabriel@gmail.com"); //segunda coluna do tipo string
@@ -33,7 +36,15 @@ public class Program {
 			
 			int rowsAffected = pst.executeUpdate(); //executa a query e retorna as linhas afetadas
 			
-			System.out.println("Done " + rowsAffected);
+			if(rowsAffected > 0) {
+				ResultSet rs = pst.getGeneratedKeys();
+				while(rs.next()) {
+					int id = rs.getInt(1);
+					System.out.println("Done! Id = " + id);
+				}
+			}
+			else
+				System.out.println("No rows affected");
 					
 			
 		}catch(SQLException | ParseException e) {
